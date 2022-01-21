@@ -167,12 +167,14 @@ def parse():
 
                         options = Options()
                         options.add_argument(f"user-agent={u_agent}")
-                        # options.add_argument("--headless")
+                        # options.add_argument('--headless')
+                        # options.add_argument('--disable-gpu')
                         """
                         If you include "--headless" you need to check for a string (data) that works 100%, and if you 
                         get "Not Found" then "--headless" generates an error and doesn't work. 
                         """
                         driver = webdriver.Chrome(r"C:\Files\chromedriver.exe", options=options)
+                        driver.minimize_window()
                         driver.get(link)
                         if k >= 10:
                             print("Ban from site #1")
