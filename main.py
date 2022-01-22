@@ -167,12 +167,7 @@ def parse():
 
                         options = Options()
                         options.add_argument(f"user-agent={u_agent}")
-                        # options.add_argument('--headless')
-                        # options.add_argument('--disable-gpu')
-                        """
-                        If you include "--headless" you need to check for a string (data) that works 100%, and if you 
-                        get "Not Found" then "--headless" generates an error and doesn't work. 
-                        """
+                        options.add_argument('--log-level=3')
                         driver = webdriver.Chrome(r"C:\Files\chromedriver.exe", options=options)
                         driver.minimize_window()
                         driver.get(link)
@@ -196,10 +191,26 @@ def parse():
                                     print("Ban from site #2")
                                     k += 1
                             except:
+                                pages = {
+                                    'I-O': '',
+                                    'I-Sp': '',
+                                    'II': '',
+                                    'III': '',
+                                    'IV': ''
+                                }
                                 driver.find_element(By.ID, "przyciskWydrukZwykly").click()
+                                pages['I-O'] = driver.page_source
+                                driver.find_element(By.XPATH, '//input[@value="Dział I-Sp"]').click()
+                                pages['I-Sp'] = driver.page_source
+                                driver.find_element(By.XPATH, '//input[@value="Dział II"]').click()
+                                pages['II'] = driver.page_source
+                                driver.find_element(By.XPATH, '//input[@value="Dział III"]').click()
+                                pages['III'] = driver.page_source
+                                driver.find_element(By.XPATH, '//input[@value="Dział IV"]').click()
+                                pages['IV'] = driver.page_source
                                 print(data, "added")
                                 cls.logger_add(data, True)
-                                save(driver.page_source, args)
+                                save(pages, args)
                                 bool = False
             else:
                 break
@@ -209,23 +220,28 @@ def parse():
 
 
 def sleep_ban():
-    print("sleep 2/6 min")
+    print("sleep 2/5 min")
     sleep(120)
-    print("sleep 4/6 min")
+    print("sleep 4/5 min")
     sleep(120)
-    print("sleep 6/6 min")
-    sleep(120)
+    print("sleep 5/5 min")
+    sleep(60)
     print("I will check again ")
 
 
-def save(html, args):
+def save(pages, args):
+    dir_name = f"{args[0]}-{args[1]}-{args[2]}"
     if os.path.exists('html'):
         pass
     else:
         os.mkdir('html')
-    name = f"{args[0]}-{args[1]}-{args[2]}"
-    with open('html/' + f"{name}.html", "w", encoding="utf-8") as file:
-        file.write(html.replace('href="/', 'href="https://przegladarka-ekw.ms.gov.pl/').replace('src="/', 'href="https://przegladarka-ekw.ms.gov.pl/'))
+    if os.path.exists(f'html/{dir_name}'):
+        pass
+    else:
+        os.mkdir(f'html/{dir_name}')
+    for page in pages:
+        with open('html/' + f'{dir_name}/' + f'{page}.html', 'w', encoding='utf-8') as file:
+            file.write(pages[page])
 
 
 def main():
