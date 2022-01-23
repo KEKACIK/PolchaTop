@@ -2,7 +2,7 @@ import os
 from random import randint
 from time import sleep
 
-from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
@@ -108,8 +108,11 @@ agents = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36'
 ]
 
+proxys = []     # here is the proxy list
+
 link = "https://przegladarka-ekw.ms.gov.pl/eukw_prz/KsiegiWieczyste/wyszukiwanieKW" \
        "?komunikaty=true&kontakt=true&okienkoSerwisowe=false"
+
 
 
 class File:
@@ -162,14 +165,23 @@ def parse():
                     bool = True
                     while bool:
                         sleep(10)
-                        u_agent = agents[randint(0, len(agents) - 2)]
+                        u_agent = agents[randint(0, len(agents) - 1)]
+                        proxy = proxys[randint(0, len(agents) - 1)]
                         args = data.split('/')
 
                         options = Options()
                         options.add_argument(f"user-agent={u_agent}")
                         options.add_argument('--log-level=3')
-                        driver = webdriver.Chrome(r"C:\Files\chromedriver.exe", options=options)
-                        driver.minimize_window()
+                        seleniumwire_options = {
+                            'proxy': {
+                                'http': f"http://{proxy}",
+                                'https': f"https://{proxy}",
+                                'no_proxy': 'localhost,127.0.0.1',
+                            }
+                        }
+                        driver = webdriver.Chrome(r"C:\Files\chromedriver.exe", options=options,
+                                                  seleniumwire_options=seleniumwire_options)
+                        # driver.minimize_window()
                         driver.get(link)
                         if k >= 10:
                             print("Ban from site #1")
@@ -208,10 +220,12 @@ def parse():
                                 pages['III'] = driver.page_source
                                 driver.find_element(By.XPATH, '//input[@value="Dział IV"]').click()
                                 pages['IV'] = driver.page_source
+                                driver.quit()
                                 print(data, "added")
                                 cls.logger_add(data, True)
                                 save(pages, args)
                                 bool = False
+                            driver.quit()
             else:
                 break
         except:
