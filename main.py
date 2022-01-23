@@ -166,21 +166,24 @@ def parse():
                     while bool:
                         sleep(10)
                         u_agent = agents[randint(0, len(agents) - 1)]
-                        proxy = proxys[randint(0, len(agents) - 1)]
                         args = data.split('/')
 
                         options = Options()
                         options.add_argument(f"user-agent={u_agent}")
                         options.add_argument('--log-level=3')
-                        seleniumwire_options = {
-                            'proxy': {
-                                'http': f"http://{proxy}",
-                                'https': f"https://{proxy}",
-                                'no_proxy': 'localhost,127.0.0.1',
+                        if len(proxys) < 1:
+                            driver = webdriver.Chrome(r"C:\Files\chromedriver.exe", options=options)
+                        else:
+                            proxy = proxys[randint(0, len(agents) - 1)]
+                            seleniumwire_options = {
+                                'proxy': {
+                                    'http': f"http://{proxy}",
+                                    'https': f"https://{proxy}",
+                                    'no_proxy': 'localhost,127.0.0.1',
+                                }
                             }
-                        }
-                        driver = webdriver.Chrome(r"C:\Files\chromedriver.exe", options=options,
-                                                  seleniumwire_options=seleniumwire_options)
+                            driver = webdriver.Chrome(r"C:\Files\chromedriver.exe", options=options,
+                                                      seleniumwire_options=seleniumwire_options)
                         # driver.minimize_window()
                         driver.get(link)
                         if k >= 10:
